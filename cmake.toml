@@ -4,6 +4,7 @@
 # > cmake --build build --config Release
 [project]
 name = "reframework"
+languages = ["CXX", "C", "CSharp"]
 cmake-after = """
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
@@ -30,6 +31,18 @@ if ("${CMAKE_BUILD_TYPE}" MATCHES "Release")
 endif()
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
+set(NUGET_PACKAGES_DIR "$ENV{NUGET_PACKAGES}")
+
+# If NUGET_PACKAGES_DIR is not set, fall back to the default location
+if(NOT NUGET_PACKAGES_DIR)
+    if(WIN32)
+        set(DEFAULT_NUGET_PATH "$ENV{USERPROFILE}/.nuget/packages")
+    else()
+        set(DEFAULT_NUGET_PATH "$ENV{HOME}/.nuget/packages")
+    endif()
+    set(NUGET_PACKAGES_DIR ${DEFAULT_NUGET_PATH})
+endif()
 """
 
 [options]
@@ -82,7 +95,7 @@ tag = "f5026eb34e7053b1aff325d38db107703f394974"
 
 [fetch-content.directxtk12]
 git = "https://github.com/microsoft/DirectXTK12"
-tag = "be5dfc7e391aefaa4eeab8e8a08f7e2669e56cbb"
+tag = "528801aa6dd8d628c2f756c41a76d300f47de478"
 
 [target.spdlog]
 cmake-after="""
@@ -177,7 +190,7 @@ tag = "v1.34.10"
 
 [fetch-content.kananlib]
 git = "https://github.com/cursey/kananlib"
-tag = "8b29e1694dbf4ad4c878ff54bcbcabf280b37168"
+tag = "61a04d4219e3cb81b524a6990d3924289982bbf6"
 
 [target.utility]
 type = "static"
@@ -256,6 +269,7 @@ LIBRARY_OUTPUT_DIRECTORY_RELEASE = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 ARCHIVE_OUTPUT_DIRECTORY_RELEASE = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
+# VS_GLOBAL_ResolveNuGetPackages = "false"
 
 [target.RE2SDK]
 type = "sdk"

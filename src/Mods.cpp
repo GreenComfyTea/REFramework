@@ -1,6 +1,5 @@
 #include <spdlog/spdlog.h>
 
-#include "mods/BackBufferRenderer.hpp"
 #include "mods/APIProxy.hpp"
 #include "mods/Camera.hpp"
 #include "mods/Graphics.hpp"
@@ -21,7 +20,6 @@
 #include "Mods.hpp"
 
 Mods::Mods() {
-    m_mods.emplace_back(BackBufferRenderer::get());
     m_mods.emplace_back(REFrameworkConfig::get());
 
 #if defined(REENGINE_AT)
