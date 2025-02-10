@@ -16,13 +16,13 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
-        
+
       - name: Configure CMake
         run: cmake -S ${{github.workspace}}/csharp-api -B ${{github.workspace}}/csharp-api/build -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: Build
         run: cmake --build ${{github.workspace}}/csharp-api/build --config ${{env.BUILD_TYPE}} --target ALL_BUILD
-      
+
       - name: Compress release
         run: |
           pip install -r ${{github.workspace}}/csharp-api/requirements.txt
@@ -35,11 +35,6 @@ jobs:
           path: ${{github.workspace}}/csharp-api/reframework/
           if-no-files-found: error
 
-name: Dev Release
-on: [push, workflow_dispatch]
-env:
-  BUILD_TYPE: Release
-jobs:
   dev-release:
     runs-on: windows-latest
     strategy:
@@ -77,37 +72,3 @@ jobs:
           name: ${{matrix.target}}
           path: ${{github.workspace}}/${{matrix.target}}.zip
           if-no-files-found: error
-
-  nightly-push:
-    runs-on: windows-latest
-    needs: dev-release
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
-        with:
-          persist-credentials: false
-
-      - name: Download artifacts
-        uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427
-        with:
-          path: ${{github.workspace}}/artifacts
-
-      - name: Set padded run number
-        run: |
-          $paddedRunNumber = "{0:D5}" -f ${{ github.run_number }}
-          echo "RUN_NUMBER=$paddedRunNumber" >> $env:GITHUB_ENV
-        shell: powershell
-
-      - name: Create Release
-        uses: ncipollo/release-action@6c75be85e571768fa31b40abf38de58ba0397db5
-        with:
-          repo: REFramework-nightly
-          owner: praydog
-          token: ${{ secrets.REPO_TOKEN }}
-          name: ${{format('REF Nightly {0} ({1})', env.RUN_NUMBER, github.sha)}}
-          tag: ${{format('nightly-{0}-{1}', env.RUN_NUMBER, github.sha)}}
-          artifacts: ${{github.workspace}}/artifacts/**/*.zip
-          makeLatest: true
-          bodyFile: ${{github.workspace}}/nightly-body.md
-          allowUpdates: true
